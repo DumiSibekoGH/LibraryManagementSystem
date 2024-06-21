@@ -41,47 +41,38 @@ public class FileHandler {
 	}
 	
 	public static String readFromLibFile(String filename) {
-		String info = "";
-		System.out.println(filename);
-		String[] arrName = filename.split(".");
-		
-		System.out.println(arrName);
-		
-		String filetype = arrName[arrName.length-1];
-		
-		File f = new File(filename);
-		
-		if(filetype.compareTo("txt") == 0) {
-			try {
-			
-			Scanner scIn = new Scanner(f);
-				
-			while(scIn.hasNext()) {
-				info += scIn.nextLine() + "\n";
-			}
-				
-			scIn.close();
-			}catch(FileNotFoundException fnfe) {
-				System.out.print("File not found. Please check filepath/filename");
-			}	
-		}else {
-			try {
-				FileInputStream fis = new FileInputStream(f);
-				DataInputStream dataIn = new DataInputStream(fis);
-				BufferedInputStream buffIn = new BufferedInputStream(dataIn);
-				
-				while(buffIn.available() > 0) {
-					buffIn.read();
-				}
-				
-				buffIn.close();
-			}catch(IOException ioe) {
-				
-			}
-		}
-		
-		return info;
+	    String info = "";
+	    
+	    File f = new File(filename);
+	    
+	    // Split filename to get file extension
+	    String[] arrName = filename.split("\\.");
+	    String filetype = arrName[arrName.length - 1];
+	    
+	    if (filetype.equals("txt")) {
+	        try (Scanner scIn = new Scanner(f)) {
+	            while (scIn.hasNextLine()) {
+	                info += scIn.nextLine() + "\n";
+	            }
+	        } catch (FileNotFoundException fnfe) {
+	            System.out.println("File not found. Please check filepath/filename");
+	        }
+	    } else {
+	        try (FileInputStream fis = new FileInputStream(f);
+	             BufferedInputStream buffIn = new BufferedInputStream(fis)) {
+	            
+	            byte[] data = new byte[(int) f.length()];
+	            buffIn.read(data);
+	            info = new String(data, StandardCharsets.UTF_8);
+	            
+	        } catch (IOException ioe) {
+	            System.out.println("Error reading file: " + ioe.getMessage());
+	        }
+	    }
+	    
+	    return info;
 	}
+
 	
 	public String readFromPwdFile(String filename) {
 		String txtPwd = "";
